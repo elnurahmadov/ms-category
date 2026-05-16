@@ -1,37 +1,42 @@
 package az.ingress.aspect;
 
-import az.ingress.logger.ApplicationLogger;
-import lombok.SneakyThrows;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
 @Aspect
 @Component
+@Slf4j
 public class LoggingAspect {
 
-    private final ApplicationLogger logger = ApplicationLogger.getLogger(LoggingAspect.class);
+    @Pointcut("execution(* az.ingress.controller.*.*(..))")
+    public void controllerMethods() {
+    }
 
-    @SneakyThrows
-    @Around("execution(* az.ingress.service..*(..))")
-    public Object logServiceMethods(ProceedingJoinPoint jp) {
+    @Before("controllerMethods()")
+    public void logBefore(JoinPoint joinPoint) {
+        log.info("Called controller method : {} with args : {}", joinPoint.getSignature().getName(),
+                Arrays.stream(joinPoint.getArgs())
+                        .map(arg -> arg instanceof String s && s.length() > 50 ? "[TRUNCATED]" : arg)
+                        .toList());
+    }
 
-        var methodName = jp.getSignature().getName();
-        Object[] args = jp.getArgs();
-        var params = Arrays.toString(args);
+    @AfterReturning(pointcut = "controllerMethods()", returning = "result")
+    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+        log.info("Called controller method : {} returned with status : {}", joinPoint.getSignature().getName(),
+                result instanceof ResponseEntity<?> r ? r.getStatusCode() : result);
+    }
 
-        logger.info("ActionLog.{}.start - {}", methodName, params);
-
-        try {
-            var result = jp.proceed();
-            logger.info("ActionLog.{}.end - {}", methodName, params);
-            return result;
-        } catch (Exception ex) {
-            logger.error("ActionLog.{}.error - {} - {}", methodName, params, ex.getMessage());
-            throw ex;
-        }
+    @AfterThrowing(pointcut = "controllerMethods()", throwing = "ex")
+    public void logAfterThrowing(JoinPoint joinPoint, Exception ex) {
+        log.error("Exception in method : {}", joinPoint.getSignature().getName(), ex);
     }
 }

@@ -1,5 +1,6 @@
 package az.ingress.service.concrete;
 
+import az.ingress.aspect.ExecutionTracker;
 import az.ingress.dao.entity.CategoryEntity;
 import az.ingress.dao.repository.CategoryRepository;
 import az.ingress.exception.ConflictException;
@@ -23,6 +24,7 @@ import static java.time.temporal.ChronoUnit.HOURS;
 
 @Service
 @RequiredArgsConstructor
+@ExecutionTracker
 public class CategoryServiceHandler implements CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -46,11 +48,11 @@ public class CategoryServiceHandler implements CategoryService {
 
         categoryRepository.save(category);
         clearAllCaches();
-
     }
 
     @Override
     public List<CategoryResponse> getCategories() {
+
         List<CategoryResponse> response;
 
         response = cacheUtil.getBucket(CATEGORY_CACHE_KEY);
