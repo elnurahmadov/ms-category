@@ -5,6 +5,7 @@ import az.ingress.model.response.CategoryResponse;
 import az.ingress.service.abstraction.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,11 @@ public class CategoryController {
     @ResponseStatus(CREATED)
     public void createCategory(@RequestBody @Valid CategoryRequest categoryRequest) {
         categoryService.createCategory(categoryRequest);
+    }
+
+    @GetMapping("/{id}")
+    public CategoryResponse getCategory(@PathVariable Long id) {
+        return categoryService.getCategory(id);
     }
 
     @GetMapping

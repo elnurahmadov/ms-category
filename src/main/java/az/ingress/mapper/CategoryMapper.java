@@ -20,11 +20,7 @@ public enum CategoryMapper {
         return CategoryEntity.builder()
                 .name(categoryRequest.getName())
                 .slug(categoryRequest.getSlug())
-                .sortOrder(
-                        categoryRequest.getSortOrder() != null
-                                ? categoryRequest.getSortOrder()
-                                : 0
-                )
+                .sortOrder(categoryRequest.getSortOrder() == null ? 0 : categoryRequest.getSortOrder())
                 .status(ACTIVE)
                 .build();
     }
@@ -44,10 +40,8 @@ public enum CategoryMapper {
         List<CategoryResponse> roots = new ArrayList<>();
         for (CategoryEntity cat : categories) {
             CategoryResponse node = idToNode.get(cat.getId());
-            if (cat.getParent() != null) {
-                CategoryResponse parentNode = idToNode.get(cat.getParent().getId());
-                parentNode.getChildren().add(node);
-            } else {
+            if (cat.getParent() != null) idToNode.get(cat.getParent().getId()).getChildren().add(node);
+            else {
                 roots.add(node);
             }
         }
@@ -57,9 +51,22 @@ public enum CategoryMapper {
         return roots;
     }
 
+    public CategoryResponse toResponse(CategoryEntity categoryEntity) {
+        return CategoryResponse.builder()
+                .id(categoryEntity.getId())
+                .name(categoryEntity.getName())
+                .slug(categoryEntity.getSlug())
+                .categoryStatus(categoryEntity.getStatus())
+                .sortOrder(categoryEntity.getSortOrder())
+                .children(new ArrayList<>())
+                .build();
+    }
+
     private void sortChildrenRecursively(List<CategoryResponse> nodes) {
         nodes.sort(Comparator.comparing(CategoryResponse::getSortOrder));
-        nodes.forEach(node -> sortChildrenRecursively(node.getChildren()));
+        nodes.forEach(node -> {
+            if (!node.getChildren().isEmpty()) sortChildrenRecursively(node.getChildren());
+        });
     }
 
 }

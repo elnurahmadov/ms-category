@@ -69,6 +69,13 @@ public class CategoryServiceHandler implements CategoryService {
         return response;
     }
 
+    @Override
+    public CategoryResponse getCategory(Long id) {
+        return categoryRepository.findById(id)
+                .map(CATEGORY_MAPPER::toResponse)
+                .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND, id));
+    }
+
     private void clearAllCaches() {
         cacheUtil.deleteKey(CATEGORY_CACHE_KEY);
     }

@@ -9,4 +9,6 @@ public interface CategoryService {
     void createCategory(CategoryRequest categoryRequest);
 
     List<CategoryResponse> getCategories();
+
+    CategoryResponse getCategory(Long id);
 }
