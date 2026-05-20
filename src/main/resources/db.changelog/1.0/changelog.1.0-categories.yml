@@ -46,6 +46,7 @@ databaseChangeLog:
               - column:
                   name: updated_at
                   type: TIMESTAMP
+                  defaultValue: now()
         - addForeignKeyConstraint:
             baseTableName: categories
             baseColumnNames: parent_id
