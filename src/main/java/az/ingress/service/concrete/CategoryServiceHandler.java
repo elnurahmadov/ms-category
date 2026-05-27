@@ -43,7 +43,7 @@ public class CategoryServiceHandler implements CategoryService {
         var category = CATEGORY_MAPPER.buildCategoryEntity(categoryRequest);
 
         if (categoryRequest.getParentId() != null) {
-            var parent = findCategoryById(categoryRequest.getParentId());
+            var parent = fetchCategoryIfExist(categoryRequest.getParentId());
             category.setParent(parent);
         }
 
@@ -72,19 +72,19 @@ public class CategoryServiceHandler implements CategoryService {
 
     @Override
     public CategoryResponse getCategory(Long id) {
-        return CATEGORY_MAPPER.toResponse(findCategoryById(id));
+        return CATEGORY_MAPPER.toResponse(fetchCategoryIfExist(id));
     }
 
     @Override
     @Transactional
     public void updateStatus(Long id, CategoryStatus status) {
-        var category = findCategoryById(id);
+        var category = fetchCategoryIfExist(id);
         category.setStatus(status);
     }
 
     @Override
     public void deleteCategory(Long id) {
-        var category = findCategoryById(id);
+        var category = fetchCategoryIfExist(id);
 
         if (categoryRepository.existsByParentId(id)) {
             throw new ConflictException(CATEGORY_HAS_CHILDREN, id);
@@ -94,7 +94,7 @@ public class CategoryServiceHandler implements CategoryService {
         clearAllCaches();
     }
 
-    private CategoryEntity findCategoryById(Long id) {
+    private CategoryEntity fetchCategoryIfExist(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND, id));
     }
