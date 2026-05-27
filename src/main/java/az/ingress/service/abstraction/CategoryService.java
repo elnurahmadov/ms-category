@@ -1,5 +1,6 @@
 package az.ingress.service.abstraction;
 
+import az.ingress.model.enums.CategoryStatus;
 import az.ingress.model.request.CategoryRequest;
 import az.ingress.model.response.CategoryResponse;
 
@@ -11,4 +12,6 @@ public interface CategoryService {
     List<CategoryResponse> getCategories();
 
     CategoryResponse getCategory(Long id);
+
+    void updateStatus(Long id, CategoryStatus status);
 }

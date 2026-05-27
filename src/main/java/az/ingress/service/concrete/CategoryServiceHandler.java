@@ -5,6 +5,7 @@ import az.ingress.dao.entity.CategoryEntity;
 import az.ingress.dao.repository.CategoryRepository;
 import az.ingress.exception.ConflictException;
 import az.ingress.exception.NotFoundException;
+import az.ingress.model.enums.CategoryStatus;
 import az.ingress.model.request.CategoryRequest;
 import az.ingress.model.response.CategoryResponse;
 import az.ingress.service.abstraction.CategoryService;
@@ -41,8 +42,7 @@ public class CategoryServiceHandler implements CategoryService {
         var category = CATEGORY_MAPPER.buildCategoryEntity(categoryRequest);
 
         if (categoryRequest.getParentId() != null) {
-            var parent = categoryRepository.findById(categoryRequest.getParentId())
-                    .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND, categoryRequest.getParentId()));
+            var parent = findCategoryById(categoryRequest.getParentId());
             category.setParent(parent);
         }
 
@@ -71,8 +71,18 @@ public class CategoryServiceHandler implements CategoryService {
 
     @Override
     public CategoryResponse getCategory(Long id) {
+        return CATEGORY_MAPPER.toResponse(findCategoryById(id));
+    }
+
+    @Override
+    @Transactional
+    public void updateStatus(Long id, CategoryStatus status) {
+        var category = findCategoryById(id);
+        category.setStatus(status);
+    }
+
+    private CategoryEntity findCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .map(CATEGORY_MAPPER::toResponse)
                 .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND, id));
     }
 
