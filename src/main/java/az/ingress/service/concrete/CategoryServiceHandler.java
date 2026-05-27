@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static az.ingress.exception.ErrorMessage.CATEGORY_HAS_CHILDREN;
 import static az.ingress.exception.ErrorMessage.CATEGORY_NOT_FOUND;
 import static az.ingress.exception.ErrorMessage.CATEGORY_SLUG_ALREADY_EXISTS;
 import static az.ingress.mapper.CategoryMapper.CATEGORY_MAPPER;
@@ -84,6 +85,11 @@ public class CategoryServiceHandler implements CategoryService {
     @Override
     public void deleteCategory(Long id) {
         var category = findCategoryById(id);
+
+        if (categoryRepository.existsByParentId(id)) {
+            throw new ConflictException(CATEGORY_HAS_CHILDREN, id);
+        }
+
         categoryRepository.delete(category);
         clearAllCaches();
     }
