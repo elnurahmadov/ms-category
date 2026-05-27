@@ -3,6 +3,7 @@ package az.ingress.mapper;
 import az.ingress.dao.entity.CategoryEntity;
 import az.ingress.model.request.CategoryRequest;
 import az.ingress.model.response.CategoryResponse;
+import az.ingress.model.response.PageableResponse;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,4 +70,13 @@ public enum CategoryMapper {
         });
     }
 
+    public PageableResponse buildPageableResponse(List<CategoryEntity> content, boolean hasNext,
+                                                  int totalPages, long totalElements) {
+        return PageableResponse.builder()
+                .categories(content.stream().map(this::toResponse).toList())
+                .hasNextPage(hasNext)
+                .lastPageNumber(totalPages)
+                .totalElements(totalElements)
+                .build();
+    }
 }

@@ -1,8 +1,11 @@
 package az.ingress.controller;
 
+import az.ingress.model.criteria.CategoryCriteria;
+import az.ingress.model.criteria.PageCriteria;
 import az.ingress.model.enums.CategoryStatus;
 import az.ingress.model.request.CategoryRequest;
 import az.ingress.model.response.CategoryResponse;
+import az.ingress.model.response.PageableResponse;
 import az.ingress.service.abstraction.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,5 +58,10 @@ public class CategoryController {
     @ResponseStatus(NO_CONTENT)
     public void deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
+    }
+
+    @GetMapping("/filter")
+    public PageableResponse filterCategories(PageCriteria pageCriteria, CategoryCriteria categoryCriteria) {
+        return categoryService.filterCategories(pageCriteria, categoryCriteria);
     }
 }

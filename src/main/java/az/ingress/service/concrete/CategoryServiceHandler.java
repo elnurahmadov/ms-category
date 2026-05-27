@@ -2,15 +2,22 @@ package az.ingress.service.concrete;
 
 import az.ingress.aspect.ExecutionTracker;
 import az.ingress.dao.entity.CategoryEntity;
+import az.ingress.dao.entity.CategoryEntity.Fields;
 import az.ingress.dao.repository.CategoryRepository;
 import az.ingress.exception.ConflictException;
 import az.ingress.exception.NotFoundException;
+import az.ingress.model.criteria.CategoryCriteria;
+import az.ingress.model.criteria.PageCriteria;
 import az.ingress.model.enums.CategoryStatus;
 import az.ingress.model.request.CategoryRequest;
 import az.ingress.model.response.CategoryResponse;
+import az.ingress.model.response.PageableResponse;
 import az.ingress.service.abstraction.CategoryService;
+import az.ingress.service.specification.CategorySpecification;
 import az.ingress.util.CacheUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,6 +99,22 @@ public class CategoryServiceHandler implements CategoryService {
 
         categoryRepository.delete(category);
         clearAllCaches();
+    }
+
+    @Override
+    public PageableResponse filterCategories(PageCriteria pageCriteria, CategoryCriteria categoryCriteria) {
+        var pageRequest = PageRequest.of(
+                pageCriteria.getPage(),
+                pageCriteria.getCount(),
+                Sort.by(Fields.id).descending());
+        var specification = CategorySpecification.of(categoryCriteria);
+        var categoriesPage = categoryRepository.findAll(specification, pageRequest);
+
+        return CATEGORY_MAPPER.buildPageableResponse(categoriesPage.getContent(),
+                categoriesPage.hasNext(),
+                categoriesPage.getTotalPages(),
+                categoriesPage.getTotalElements()
+        );
     }
 
     private CategoryEntity fetchCategoryIfExist(Long id) {
