@@ -3,7 +3,6 @@ package az.ingress.service.specification;
 import az.ingress.dao.entity.CategoryEntity;
 import az.ingress.dao.entity.CategoryEntity.Fields;
 import az.ingress.model.criteria.CategoryCriteria;
-import az.ingress.model.enums.CategoryStatus;
 import az.ingress.util.PredicateUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +13,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+import static az.ingress.model.enums.CategoryStatus.INACTIVE;
 
 @AllArgsConstructor(staticName = "of")
 @Data
@@ -48,7 +49,7 @@ public class CategorySpecification implements Specification<CategoryEntity> {
                         )
                 )
                 .add(
-                        CategoryStatus.INACTIVE,
+                        INACTIVE,
                         status -> cb.notEqual(
                                 root.get(Fields.status),
                                 status

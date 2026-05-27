@@ -11,7 +11,6 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryCriteria {
-
     private String name;
     private ZonedDateTime createdFrom;
     private ZonedDateTime createdTo;

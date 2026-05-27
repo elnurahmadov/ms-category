@@ -6,6 +6,7 @@ import az.ingress.dao.entity.CategoryEntity.Fields;
 import az.ingress.dao.repository.CategoryRepository;
 import az.ingress.exception.ConflictException;
 import az.ingress.exception.NotFoundException;
+import az.ingress.logger.ApplicationLogger;
 import az.ingress.model.criteria.CategoryCriteria;
 import az.ingress.model.criteria.PageCriteria;
 import az.ingress.model.enums.CategoryStatus;
@@ -36,6 +37,8 @@ import static java.time.temporal.ChronoUnit.HOURS;
 @ExecutionTracker
 public class CategoryServiceHandler implements CategoryService {
 
+    private final ApplicationLogger logger = ApplicationLogger.getLogger(CategoryServiceHandler.class);
+
     private final CategoryRepository categoryRepository;
     private final CacheUtil cacheUtil;
 
@@ -44,6 +47,7 @@ public class CategoryServiceHandler implements CategoryService {
     public void createCategory(CategoryRequest categoryRequest) {
 
         if (categoryRepository.existsBySlug(categoryRequest.getSlug())) {
+            logger.error("Category with slug {} already exists", categoryRequest.getSlug());
             throw new ConflictException(CATEGORY_SLUG_ALREADY_EXISTS, categoryRequest.getSlug());
         }
 
@@ -94,6 +98,7 @@ public class CategoryServiceHandler implements CategoryService {
         var category = fetchCategoryIfExist(id);
 
         if (categoryRepository.existsByParentId(id)) {
+            logger.error("Category with id {} has child categories", id);
             throw new ConflictException(CATEGORY_HAS_CHILDREN, id);
         }
 
@@ -119,7 +124,10 @@ public class CategoryServiceHandler implements CategoryService {
 
     private CategoryEntity fetchCategoryIfExist(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND, id));
+                .orElseThrow(() -> {
+                    logger.error("Category not found with id: {}", id);
+                    return new NotFoundException(CATEGORY_NOT_FOUND, id);
+                });
     }
 
     private void clearAllCaches() {
