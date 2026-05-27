@@ -81,6 +81,13 @@ public class CategoryServiceHandler implements CategoryService {
         category.setStatus(status);
     }
 
+    @Override
+    public void deleteCategory(Long id) {
+        var category = findCategoryById(id);
+        categoryRepository.delete(category);
+        clearAllCaches();
+    }
+
     private CategoryEntity findCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND, id));

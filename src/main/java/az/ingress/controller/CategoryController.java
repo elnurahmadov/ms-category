@@ -5,6 +5,7 @@ import az.ingress.model.request.CategoryRequest;
 import az.ingress.model.response.CategoryResponse;
 import az.ingress.service.abstraction.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,5 +49,11 @@ public class CategoryController {
     @ResponseStatus(NO_CONTENT)
     public void updateStatus(@PathVariable Long id, @RequestParam CategoryStatus status) {
         categoryService.updateStatus(id, status);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
+    public void deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
     }
 }
