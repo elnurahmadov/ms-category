@@ -34,7 +34,7 @@ public enum CategoryMapper {
                         cat.getSlug(),
                         cat.getStatus(),
                         cat.getSortOrder(),
-                        new ArrayList<>()
+                        List.of()
                 ))
                 .collect(Collectors.toMap(CategoryResponse::getId, Function.identity()));
 
@@ -59,7 +59,7 @@ public enum CategoryMapper {
                 .slug(categoryEntity.getSlug())
                 .categoryStatus(categoryEntity.getStatus())
                 .sortOrder(categoryEntity.getSortOrder())
-                .children(new ArrayList<>())
+                .children(List.of())
                 .build();
     }
 
