@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -48,8 +49,9 @@ public class CategoryEntity {
 
     private Integer sortOrder;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_id")
+    @ToString.Exclude
     private CategoryEntity parent;
 
     @CreationTimestamp
